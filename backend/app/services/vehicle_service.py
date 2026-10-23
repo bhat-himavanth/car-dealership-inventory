@@ -64,3 +64,34 @@ def update_vehicle(db: Session, vehicle_id: int, changes: VehicleUpdate) -> Vehi
 def delete_vehicle(db: Session, vehicle_id: int) -> None:
     db.delete(get_vehicle(db, vehicle_id))
     db.commit()
+
+# ---------- Inventory (added in TDD cycle 4) ----------
+
+class OutOfStock(Exception):
+    pass
+
+
+def purchase_vehicle(db: Session, vehicle_id: int) -> Vehicle:
+    get_vehicle(db, vehicle_id)  # raises VehicleNotFound if it doesn't exist
+
+    # Check-and-decrement in a single UPDATE so two buyers clicking at the
+    # same moment can't both buy the last car (no race condition).
+    result = db.execute(
+        update(Vehicle)
+        .where(Vehicle.id == vehicle_id, Vehicle.quantity > 0)
+        .values(quantity=Vehicle.quantity - 1)
+    )
+    if result.rowcount == 0:
+        db.rollback()
+        raise OutOfStock(vehicle_id)
+
+    db.commit()
+    return get_vehicle(db, vehicle_id)
+
+
+def restock_vehicle(db: Session, vehicle_id: int, amount: int) -> Vehicle:
+    vehicle = get_vehicle(db, vehicle_id)
+    vehicle.quantity += amount
+    db.commit()
+    db.refresh(vehicle)
+    return vehicle

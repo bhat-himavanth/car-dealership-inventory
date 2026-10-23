@@ -56,3 +56,21 @@ def delete_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
     except service.VehicleNotFound:
         raise not_found()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+# ---------- Inventory (added in TDD cycle 4) ----------
+
+@router.post("/{vehicle_id}/purchase", response_model=VehicleOut)
+def purchase_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
+    try:
+        return service.purchase_vehicle(db, vehicle_id)
+    except service.VehicleNotFound:
+        raise not_found()
+    except service.OutOfStock:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Vehicle is out of stock")
+
+
+@router.post("/{vehicle_id}/restock", response_model=VehicleOut, dependencies=[Depends(require_admin)])
+def restock_vehicle(vehicle_id: int, body: RestockRequest, db: Session = Depends(get_db)):
+    try:
+        return service.restock_vehicle(db, vehicle_id, body.amount)
+    except service.VehicleNotFound:
+        raise not_found()
