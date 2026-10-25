@@ -115,9 +115,65 @@ Frontend: 7 passed
 
 ## My AI Usage
 
-<!-- Write this section in your own words – the interviewers will ask about it. -->
+### Tools used
+- **Claude (Anthropic, via claude.ai)** – the only AI tool I used. Raw chat links are in [PROMPTS.md](PROMPTS.md).
 
-**Tools used:** Claude (Anthropic) via claude.ai.
+### How I used it
+
+**1. As a pair-programming mentor, not just a code generator**
+Full-stack development was new to me, so I used Claude to learn as I built. For each file
+I asked *why* it was designed that way: why routers and services are separate, why
+passwords are hashed with bcrypt, how JWT stateless auth works, why CORS is needed, and how
+React state and context drive the UI. I didn't move to the next step until I could explain
+the current one.
+
+**2. To follow Test-Driven Development**
+Claude drafted the test suites from the kata requirements, including edge cases I would
+have missed (expired and tampered tokens, duplicate emails in different letter case,
+buying the last unit twice). I committed each test file **before** its implementation, ran
+it to watch it fail (Red), then added the code until it passed (Green). My commit history
+shows these `test:` → `feat:` pairs for every backend feature and for the frontend
+components. The backend has 52 tests at 100% coverage.
+
+**3. For clean, SOLID design**
+I asked Claude to keep each module to one responsibility:
+- `routers/` only translate HTTP ⇄ Python and choose status codes
+- `services/` hold the business rules and know nothing about HTTP
+- `dependencies.py` provides reusable auth guards (`get_current_user`, `require_admin`)
+- `api/client.js` is the only frontend file that talks to the backend
+
+Because of this, each layer can be tested on its own, and new features extend the code
+without rewriting it.
+
+**4. For a security-first review**
+With my cybersecurity background, I paid particular attention to auth and asked Claude to
+check those decisions: passwords are only stored as salted bcrypt hashes, login returns the
+same error for an unknown email and a wrong password (so attackers can't find which accounts
+exist), the response schema never exposes password hashes, admin-only routes return 403
+(not 401), and the purchase endpoint uses a single conditional `UPDATE` to prevent a race
+condition that would sell the same last car twice.
+
+**5. For debugging my environment**
+Claude helped me get past real setup problems on Windows: Application Control blocking
+`pip.exe` (fixed by using `python -m pip`), GitHub rejecting my push over email privacy
+(switched to my noreply address), and pytest failing to import `app` (added `pythonpath`
+to `pytest.ini`).
+
+### Reflection
+- **Speed with understanding:** AI let me deliver a complete, tested full-stack app in a
+  stack I hadn't used before. Asking "why" at every step turned it into a learning exercise
+  rather than copy-paste.
+- **Tests are how I trust AI code:** AI output isn't automatically correct. Some setup steps
+  failed on my machine. Writing tests first gave me an objective check: if the tests pass
+  against the spec, the code does what it should, regardless of who wrote it.
+- **Craft still matters:** AI can produce code quickly, but whether that code is
+  well-designed, secure and readable depends on the questions you ask and what you
+  accept. I learned to ask for small, single-purpose modules and meaningful names, and to
+  review security decisions myself.
+- **Transparency:** every commit where AI helped has a `Co-authored-by` trailer, and my full,
+  unedited chats are linked in PROMPTS.md.
+- **Next time:** I'd add a proper Refactor commit after each Green step and set up CI to
+  run the tests on every push.
 
 **How I used it:**
 - …
