@@ -98,9 +98,13 @@ Frontend: 7 passed
 
 ## Screenshots
 
-| Login | Showroom (admin) |
+| Login | Admin dashboard |
 |---|---|
-| ![Login](docs/screenshots/login.png) | ![Dashboard](docs/screenshots/dashboard.png) |
+| ![Login](docs/screenshots/login.png) | ![Admin dashboard](docs/screenshots/admin-dashboard.png) |
+
+| Add vehicle (admin) | User dashboard | User search |
+|---|---|---|
+| ![Add vehicle](docs/screenshots/add-vehicle.png) | ![User dashboard](docs/screenshots/user-dashboard.png) | ![User search](docs/screenshots/user-search.png) |
 
 ## Design decisions
 
