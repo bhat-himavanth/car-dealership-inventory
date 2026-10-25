@@ -174,10 +174,3 @@ to `pytest.ini`).
   unedited chats are linked in PROMPTS.md.
 - **Next time:** I'd add a proper Refactor commit after each Green step and set up CI to
   run the tests on every push.
-
-**How I used it:**
-- …
-- …
-
-**Reflection:**
-…
